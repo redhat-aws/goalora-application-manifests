@@ -1,0 +1,13 @@
+apiVersion: keycloak.org/v1alpha1
+kind: Keycloak
+metadata:
+  labels:
+    app: sso
+  name: goalsetter-keycloak
+spec:
+  extensions:
+    - >-
+      https://itd-game-download.s3.us-east-2.amazonaws.com/keycloak-discord-0.4.9-SNAPSHOT.jar
+  externalAccess:
+    enabled: true
+  instances: 1

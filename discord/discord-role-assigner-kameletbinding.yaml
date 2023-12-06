@@ -1,0 +1,31 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: KameletBinding
+metadata:
+  name: http-to-discord
+  annotations:
+    trait.camel.apache.org/mount.configs: "secret:addrole"
+spec:
+  source:
+    uri: "platform-http:/assignRole?httpMethodRestrict=POST"
+    steps:
+      - setHeader:
+          name: discordUser
+          simple: "${exchangeProperty.discordUser}"
+      - setHeader:
+          name: Access-Control-Allow-Origin
+          constant: "*"  # replace with your actual origin
+      - setHeader:
+          name: Access-Control-Allow-Methods
+          constant: "POST"
+      - setHeader:
+          name: Access-Control-Allow-Headers
+          constant: "Content-Type"
+  sink:
+    ref:
+      kind: Kamelet
+      apiVersion: camel.apache.org/v1
+      name: discord-role-assigner
+    properties:
+      token: "{{discord.token}}"
+      guild: "{{discord.guild}}"
+      role: "{{discord.role}}"

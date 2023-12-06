@@ -1,0 +1,42 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: goalora-landing-page-ssl
+  labels:
+    app: goalora-landing-page
+    app.kubernetes.io/component: goalora-landing-page
+    app.kubernetes.io/instance: goalora-landing-page
+    app.kubernetes.io/name: goalora-landing-page
+    app.kubernetes.io/part-of: goalora-landing-page
+    app.openshift.io/runtime: httpd
+    app.openshift.io/runtime-version: 2.4-el7
+spec:
+  host: goalora.com
+  to:
+    kind: Service
+    name: goalora-landing-page
+    weight: 100
+  port:
+    targetPort: 8080-tcp
+  tls:
+    termination: edge
+    certificate: |-
+      -----BEGIN CERTIFICATE-----
+      
+      -----END CERTIFICATE-----
+    key: |-
+      -----BEGIN PRIVATE KEY-----
+      
+      -----END PRIVATE KEY-----
+    caCertificate: |-
+      -----BEGIN CERTIFICATE-----
+      
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      
+      -----END CERTIFICATE-----
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

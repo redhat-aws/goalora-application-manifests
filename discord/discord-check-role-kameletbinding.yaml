@@ -1,0 +1,30 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: KameletBinding
+metadata:
+  name: http-to-discord-role-check
+  annotations:
+    trait.camel.apache.org/mount.configs: "secret:rolecheck"
+spec:
+  source:
+    uri: "platform-http:/checkRole?httpMethodRestrict=GET"
+    steps:
+      - setHeader:
+          name: discordUser
+          simple: "${exchangeProperty.discordUser}"
+      - setHeader:
+          name: Access-Control-Allow-Origin
+          constant: "*"  # replace with your actual origin
+      - setHeader:
+          name: Access-Control-Allow-Methods
+          constant: "GET"
+      - setHeader:
+          name: Access-Control-Allow-Headers
+          constant: "Content-Type"
+  sink:
+    ref:
+      kind: Kamelet
+      apiVersion: camel.apache.org/v1
+      name: discord-role-checker
+    properties:
+      token: "{{discord.token}}"
+      guild: "{{discord.guild}}"

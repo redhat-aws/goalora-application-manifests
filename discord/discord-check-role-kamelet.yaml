@@ -1,0 +1,51 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: Kamelet
+metadata:
+  name: discord-role-checker
+  labels:
+    camel.apache.org/kamelet.type: source
+spec:
+  definition:
+    description: Check a user's roles in a Discord guild.
+    properties:
+      guild:
+        description: The Discord guild (server) ID
+        title: Guild Identifier
+        type: string
+      token:
+        description: The Discord bot security token
+        title: Bot Token
+        type: string
+    required:
+      - token
+      - guild
+    title: Discord Role Checker
+    type: object
+  dependencies:
+    - 'camel:kamelet'
+  flow:
+    from:
+      steps:
+        - remove-headers:
+            pattern: ^(?!discordUser).*
+        - set-header:
+            name: Content-Type
+            simple: application/json
+        - set-header:
+            name: Authorization
+            simple: 'Bot {{token}}'
+        - set-header:
+            constant: '*'
+            name: Access-Control-Allow-Origin
+        - set-header:
+            constant: GET
+            name: Access-Control-Allow-Methods
+        - toD:
+            parameters:
+              httpMethod: GET
+            uri: >-
+              https://discord.com/api/guilds/{{guild}}/members/${header.discordUser}
+      uri: 'kamelet:source'
+  types:
+    out:
+      mediaType: application/json

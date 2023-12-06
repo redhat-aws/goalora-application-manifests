@@ -1,0 +1,56 @@
+apiVersion: camel.apache.org/v1alpha1
+kind: Kamelet
+metadata:
+  name: discord-role-assigner
+  labels:
+    camel.apache.org/kamelet.type: "sink"
+spec:
+  definition:
+    title: "Discord Role Assigner"
+    description: |-
+      Assign a role to a user in a Discord guild.
+    required:
+      - token
+      - guild
+      - role
+    type: object
+    properties:
+      token:
+        title: Bot Token
+        description: The Discord bot security token
+        type: string
+      guild:
+        title: Guild Identifier
+        description: The Discord guild (server) ID
+        type: string
+      role:
+        title: Role Identifier
+        description: The Discord role ID
+        type: string
+  types:
+    out:
+      mediaType: application/json
+  dependencies:
+  - "camel:kamelet"
+  flow:
+    from:
+      uri: "kamelet:source"
+      steps:
+      - remove-headers:
+          pattern: "^(?!discordUser).*"
+      - set-header:
+          name: Content-Type
+          simple: application/json
+      - set-header:
+          name: Authorization
+          simple: Bot {{token}}
+      - set-header:
+          name: Access-Control-Allow-Origin
+          constant: "*"  # replace with your actual origin
+      - set-header:
+          name: Access-Control-Allow-Methods
+          constant: "POST"
+      - toD:
+          uri: "https://discordapp.com/api/guilds/{{guild}}/members/${header.discordUser}/roles/{{role}}"
+          parameters:
+            httpMethod: PUT
